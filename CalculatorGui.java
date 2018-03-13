@@ -11,7 +11,7 @@ public class CalculatorGui extends JFrame
     private JTextField lcdScreen;
     private JButton one, two, three, four, five, six, seven, eight,
             nine, zero, addition, substraction, multiplication, division, equal, 
-            comma, clear;
+            comma, clear, sign, sqrt;
     
     
     private String stringNumber;
@@ -20,6 +20,7 @@ public class CalculatorGui extends JFrame
     private double left, right, score;
     private boolean isLeft;
     private boolean signFlag;
+    private boolean commaFlag;
 
     
     public double getLeft()
@@ -59,6 +60,7 @@ public class CalculatorGui extends JFrame
 		 score = 0;
 		 isLeft = false;
 		 signFlag = false;
+		 commaFlag = false;
 			 
 		 Font font = new Font("Digital", Font.BOLD, 20);
 		 
@@ -66,7 +68,7 @@ public class CalculatorGui extends JFrame
 		 jPanel.setLayout(new GridBagLayout());
 		
 		 
-		 lcdScreen = new JTextField(13);
+		 lcdScreen = new JTextField(20);
 		// lcdScreen.setPreferredSize(new Dimension(100,20));
 		 lcdScreen.setHorizontalAlignment(JTextField.RIGHT);
 		 //lcdScreen.getText().length();
@@ -79,8 +81,9 @@ public class CalculatorGui extends JFrame
 		 OperationListener operationListener = new OperationListener();
 		 ClearListener clearListener = new ClearListener();
 		 EqualListener equalListener = new EqualListener();
+		 SpecialSignListener specialSignListener = new SpecialSignListener();
 		 
-		 addComp(jPanel, lcdScreen, 0, 0, 4, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 addComp(jPanel, lcdScreen, 0, 0, 6, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		
 		 seven = new JButton("7");
 		 seven.addActionListener(numberListener);
@@ -132,22 +135,34 @@ public class CalculatorGui extends JFrame
 		 substraction.addActionListener(operationListener);
 		
 		 clear = new JButton("C");
-		 addComp(jPanel, clear, 0, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);	
+		 addComp(jPanel, clear, 2, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);	
 		 clear.addActionListener(clearListener);
 		 
 		 equal = new JButton("=");
-		 addComp(jPanel, equal, 1, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 addComp(jPanel, equal, 4, 3, 1, 2, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		 equal.addActionListener(equalListener);
-		// addEqualListener(equalListener);
+		 addEqualListener(equalListener);
 		
 		 zero = new JButton("0");
-		 addComp(jPanel, zero, 2, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 addComp(jPanel, zero, 0, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		 zero.addActionListener(numberListener);
 		 
 		 addition = new JButton("+");
 		 addComp(jPanel, addition, 3, 4, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		 addition.addActionListener(operationListener);
 		// addCalculationListener(operationListener);
+		 
+		 sign = new JButton("+/-");
+		 addComp(jPanel, sign, 4,1, 1, 1,  GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 sign.addActionListener(specialSignListener);
+		 
+		 comma = new JButton(",");
+		 addComp(jPanel, comma, 1,4, 1, 1,  GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 comma.addActionListener(specialSignListener);
+		 
+		 sqrt = new JButton("sqr");
+		 addComp(jPanel, sqrt, 4,2, 1, 1,  GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+		 sqrt.addActionListener(specialSignListener);
 		 		 
 		 framePosition();
 		 this.add(jPanel);
@@ -178,7 +193,7 @@ public class CalculatorGui extends JFrame
 		gridConstraints.gridheight = compHeight;
 		gridConstraints.weightx = 50;
 		gridConstraints.weighty = 100;
-		gridConstraints.insets = new Insets(5,5,5,5);
+		gridConstraints.insets = new Insets(1,1,1,1);
 		gridConstraints.anchor = place;
 		gridConstraints.fill = stretch;
 		
@@ -207,6 +222,169 @@ public class CalculatorGui extends JFrame
 		score = 0;
 		isLeft = false;
 		signFlag = false;
+		commaFlag = false;
+	}
+	
+	
+	
+	private void diagnostic()
+	{
+		System.out.println("isLeft: " + isLeft);
+		System.out.println("left: " + left);
+		System.out.println("right: " + right);
+		System.out.println("score: " + score);
+		System.out.println("stringscore: " + stringScore);
+		System.out.println("stringNumber: " + stringNumber);
+		System.out.println("sign: " + operation);
+	}
+	
+	private String removeZeroDecimal(String stringNumber)
+	{
+		if(stringNumber.substring(stringNumber.length()-2).equals(".0")) 
+	    {
+	    	stringNumber=stringNumber.substring(0, stringNumber.length()-2);
+	    }
+		return stringNumber;
+	}
+	
+	private void calculation()
+	{
+		if(!isLeft)
+			return;
+		
+		
+		if(!stringNumber.isEmpty())
+			right = Double.parseDouble(stringNumber);	
+	
+			
+		
+        if(operation != ' ' && (!stringNumber.isEmpty()))
+        {
+        	switch(operation)
+    		{
+    			case '+':
+    				score = left + right;
+    				stringNumber = "" + score;
+				   
+    				stringScore = removeZeroDecimal(stringNumber);		
+    				lcdScreen.setText(stringScore);
+    			break;
+    			case '-':
+    				score = left - right;
+    				stringNumber = "" + score;
+				   
+    				stringScore = removeZeroDecimal(stringNumber);		
+    				lcdScreen.setText(stringScore);
+    				
+    			break;
+    			case '*':
+    					
+    				score = left * right;
+    				
+    				stringNumber = "" + score;
+				   
+    				stringScore = removeZeroDecimal(stringNumber);	;				
+    				lcdScreen.setText(stringScore);
+    			break;
+    			case '/':
+    				if(right == 0 && left == 0)
+    				{
+    					lcdScreen.setText("0");
+    				}
+    				if(right == 0)
+    				{
+    					lcdScreen.setText("Operacja niedozwolona");
+    					left = 0;
+    					right = 0;
+    				}
+    				else
+    				{
+    					score = left / right;
+    					stringNumber = "" + score;
+    				   
+        				stringScore = removeZeroDecimal(stringNumber);	
+    					lcdScreen.setText(stringScore);
+    					operation = ' ';
+    				}
+    					
+    			break;
+    		
+    		}
+    		 	  
+    		//DecimalFormat df = new DecimalFormat("###.#");
+    	  
+    		stringNumber = "";
+    		stringScore = " ";
+    	    operation = ' ';
+    	    
+    	    left = 0;
+    	    right = 0;
+    	 
+    	    isLeft = false;
+    	   // diagnostic();
+    		
+        }    
+	}
+	private class SpecialSignListener implements ActionListener
+	{
+
+	
+		public void actionPerformed(ActionEvent e) 
+		{
+			
+			if(e.getSource() == comma)
+			{
+				if(!commaFlag)
+				{
+					stringNumber += ".";
+					lcdScreen.setText(stringNumber);
+					commaFlag = true;
+				}	
+			}
+			if(e.getSource() == sign)
+			{
+				double digits = Double.parseDouble(lcdScreen.getText());
+				
+				
+				if(digits != 0)
+				{
+					digits *= -1;
+					
+					stringNumber = "" + digits;
+				    if(stringNumber.substring(stringNumber.length()-2).equals(".0")) 
+				    {
+				    	stringNumber=stringNumber.substring(0, stringNumber.length()-2);
+				    }
+					
+					
+			         lcdScreen.setText(stringNumber);
+				}
+				
+			}
+			
+			if(e.getSource() == sqrt)
+			{
+				double digits = Double.parseDouble(lcdScreen.getText());
+					
+				if(digits >= 0)
+				{
+					digits = Math.sqrt(digits);
+					
+					stringNumber = "" + digits;
+				    if(stringNumber.substring(stringNumber.length()-2).equals(".0")) 
+				    {
+				    	stringNumber=stringNumber.substring(0, stringNumber.length()-2);
+				    }
+					
+			        lcdScreen.setText(stringNumber);
+				}
+				else
+					lcdScreen.setText("Nieprawid³owe dane");
+							
+			}
+			
+		}
+		
 	}
 	
 	
@@ -241,90 +419,15 @@ public class CalculatorGui extends JFrame
 					operation = '+';
 					leftAssignation();	
 				}
+				if(e.getSource() == equal)
+				{
+					calculation();	
+				}
+				commaFlag = false;
 			}
 			
 		}
 			
-	}
-	
-	private void diagnostic()
-	{
-		System.out.println("isLeft: " + isLeft);
-		System.out.println("left: " + left);
-		System.out.println("right: " + right);
-		System.out.println("score: " + score);
-		System.out.println("stringscore: " + stringScore);
-		System.out.println("stringNumber: " + stringNumber);
-		System.out.println("sign: " + operation);
-	}
-	
-	private void calculation()
-	{
-		if(!isLeft)
-			return;
-		
-		
-		if(!stringNumber.isEmpty())
-			right = Double.parseDouble(stringNumber);	
-		
-        if(operation != ' ' && (!stringNumber.isEmpty()))
-        {
-        	switch(operation)
-    		{
-    			case '+':
-    				score = left + right;
-    				stringScore = Double.toString(score);		
-    				lcdScreen.setText(stringScore);
-    			break;
-    			case '-':
-    				score = left - right;
-    				stringScore = Double.toString(score);		
-    				lcdScreen.setText(stringScore);
-    				
-    			break;
-    			case '*':
-    					
-    				score = left * right;
-    				
-    				stringScore = Double.toString(score);		
-    				lcdScreen.setText(stringScore);
-    			break;
-    			case '/':
-    				if(right == 0 && left == 0)
-    				{
-    					lcdScreen.setText("0");
-    				}
-    				if(right == 0)
-    				{
-    					lcdScreen.setText("Operacja niedozwolona");
-    					left = 0;
-    					right = 0;
-    				}
-    				else
-    				{
-    					score = left / right;
-    					stringScore = Double.toString(score);		
-    					lcdScreen.setText(stringScore);
-    					operation = ' ';
-    				}
-    					
-    			break;
-    		
-    		}
-    		 	  
-    		//DecimalFormat df = new DecimalFormat("###.#");
-    	  
-    		stringNumber = "";
-    		stringScore = " ";
-    	    operation = ' ';
-    	    
-    	    left = 0;
-    	    right = 0;
-    	 
-    	    isLeft = false;
-    	   // diagnostic();
-    		
-        }    
 	}
 	
 	private class EqualListener implements ActionListener
@@ -333,7 +436,7 @@ public class CalculatorGui extends JFrame
 		{
 			if(e.getSource() == equal)
 			{
-				calculation();	
+				calculation();			
 			}
 			
 		}
@@ -359,7 +462,7 @@ public class CalculatorGui extends JFrame
 		public void actionPerformed(ActionEvent e) 
 		{
 			
-			if(stringNumber.length() < 10)
+			if(stringNumber.length() < 15)
 			{
 				if(e.getSource() == one)
 				{
